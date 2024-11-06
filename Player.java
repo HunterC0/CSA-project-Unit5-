@@ -1,31 +1,25 @@
 import java.util.Random;
 
-public final class Player {
-  // instance variables
-  private final String name;
-  private final String description;
+public class Player {
+     // instance variables
+    private final String name;
+    public int hitPoints;
+    private int minDamage;
+    private int maxDamage;
+    private final Random random = new Random();
+//constructor
+    public Player(String name, int hitPoints, int minDamage, int maxDamage) {
+        this.name = name;
 
-
-  private int hitPoints;
-  private int minDamage;
-  private int maxDamage;
-
-  private final Random random = new Random();
-  // contructor
-  Player(String name, String description, int hitPoints, int minDamage, int maxDamage) {
-      this.name = name;
-      this.description = description;
-
-      this.minDamage = minDamage;
-      this.maxDamage = maxDamage;
-      
-      this.hitPoints = hitPoints;
-  }
-  //default constructor
+        this.hitPoints = hitPoints;
+        this.minDamage = minDamage;
+        this.maxDamage = maxDamage;
+    }
+//default constructor
   Player() {
       this.name = "Arthur";
-      this.description = "King of England";
-
+    //description is missing, can re add later but it gave an error to room systems so I just removed it for now
+    //ill put it back later
       this.minDamage = 10;
       this.maxDamage = 20;
       
@@ -49,18 +43,34 @@ public final class Player {
           System.out.println("  " + name + " has been defeated");
       }
   }
-  public boolean isAlive() {
-      return hitPoints > 0;
-  }
+    public void takeDamage(int damage) {
+        hitPoints = Math.max(hitPoints - damage, 0);
+    }
 
-  public String getStatus() {
-      return "Player HP: " + hitPoints;
-  }
+    public void rest() {
+        System.out.println("You take a moment to rest and regain some strength.");
+        hitPoints += 10;  // Adjust health restoration as desired
+        System.out.println("HP is now:" + hitPoints);
+    }
 
-  @Override
-  public String toString() {
-      return name;
-  }
+    public void collectLoot(int lootValue) {
+        hitPoints += lootValue;
+    }
+
+    public boolean isAlive() {
+        return hitPoints > 0;
+    }
+
+    public String getStatus() {
+        return "Player HP: " + hitPoints;
+    }
+
+    @Override
+    public String toString() {
+        return name;
+    }
+}
+
 
   public String getDescription() {
       return description;
