@@ -48,5 +48,8 @@ public class Monster {
         return hitPoints > 0;
     }
 
+    public String getName() {
+        return name;
+    }
 }
 
