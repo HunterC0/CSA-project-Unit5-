@@ -6,10 +6,9 @@ public class Monster {
     private int hitPoints;
     private final int minDamage;
     private final int maxDamage;
-    private final static Random random = new Random();
+    private static final Random random = new Random();
 
-
-    private Monster(String name, String description, int hitPoints, int minDamage, int maxDamage) {
+    public Monster(String name, String description, int hitPoints, int minDamage, int maxDamage) {
         this.name = name;
         this.description = description;
         this.minDamage = minDamage;
@@ -30,20 +29,13 @@ public class Monster {
         return "Monster HP: " + hitPoints;
     }
 
-    public int attack() {
-        return random.nextInt(maxDamage - minDamage + 1) + minDamage;
+    public void attack(Player player) {
+        int damageToPlayer = random.nextInt(maxDamage - minDamage + 1) + minDamage;
+        player.setHitPoints(player.getHitPoints() - damageToPlayer);
+        System.out.println(this.getName() + " dealt " + damageToPlayer + " damage to " + player.getName());
     }
 
-    public void defend(Player player) {
-        int attackStrength = player.attack();
-        hitPoints = (hitPoints > attackStrength) ? hitPoints - attackStrength : 0;
-        System.out.printf("  %s hits %s for %d HP of damage (%s)\n", player, name, attackStrength,
-                getStatus());
-        if (hitPoints == 0) {
-            System.out.println("  " + player + " kills " + name);
-        }
-    }
-
+    
     public boolean isAlive() {
         return hitPoints > 0;
     }
@@ -51,5 +43,10 @@ public class Monster {
     public String getName() {
         return name;
     }
+    public void setHitPoints(int hitPoints){
+        this.hitPoints = hitPoints;
+    }
+    public int getHitPoints(){
+        return hitPoints;
+    }
 }
-
