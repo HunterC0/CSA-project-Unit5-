@@ -1,94 +1,124 @@
+import java.util.Random;
 import java.util.Scanner;
 
 public class RoomSystem {
     private Player player;
     private int currentRoomIndex = 0;
-    private Scanner scanner = new Scanner(System.in);
-
+    private Random random = new Random();
+    Scanner scanner = new Scanner(System.in);
     public RoomSystem(Player player) {
         this.player = player;
     }
-//bulk of the room system, choose between the index for each room, if the players HP is below 0 then game over
-//you have 4 options where to go, 3 of them mostly do the same thing, with the exception of rest which healths before starts.
-    public void startAdventure() {
-        System.out.println("Welcome to the Dungeon, " + player + "!");
+    private void enterBossRoom(){
+        Monster slimeKingMonster = new Monster("King Slime", "An enormous slime with a crown", 90, 10, 40);
 
-        while (player.isAlive() && currentRoomIndex < 5) {
-            System.out.println("\nYou enter a new room.");
-
-            if (currentRoomIndex == 0 || currentRoomIndex == 3 || currentRoomIndex == 4) {
-                enterEnemyRoom();
-            } else if (currentRoomIndex == 1) {
+    }
+    
+    public void startAdventure() { //main method in main
+        System.out.println("Welcome to the Dungeon, " + player + ", " + player.getDescription() + "!" );
+        System.out.println("1 - Enter first room, 2 - Exit dungeon");
+        String playerChoice = scanner.nextLine();
+        if (playerChoice.equals("1")){
+            System.out.println("\nYou enter room " + (currentRoomIndex + 1) + ".");
+            if (random.nextBoolean()) {
                 enterLootRoom();
-            } else if (currentRoomIndex == 2) {
-                enterPuzzleRoom();
-            }
-
-            if (!player.isAlive()) {
-                System.out.println("You have been defeated. Game over.");
-                break;
-            }
-
-            System.out.println("Choose an action: walk, search, rest, or quit");
-            String action = scanner.nextLine();
-
-            if (action.equalsIgnoreCase("walk")) {
-                currentRoomIndex++;
-            } else if (action.equalsIgnoreCase("search")) {
-                searchCurrentRoom();
-            } else if (action.equalsIgnoreCase("rest")) {
-                player.rest();
-            } else if (action.equalsIgnoreCase("quit")) {
-                System.out.println("You have left the dungeon.");
-                return;
             } else {
-                System.out.println("Invalid command.");
+                enterEnemyRoom();
             }
-        }
+            if (!player.isAlive()) {
+                System.out.println("Game over.");
+                return;
+            }
+            while (player.isAlive() && currentRoomIndex < 5) {
+                System.out.println("1 - walk into the next room, 2 - rest to restore health, 3 - go one room back");
+                String playerRoomProgressChoice = scanner.nextLine();
+
+                switch (playerRoomProgressChoice) {
+                    case "1" -> {
+                        currentRoomIndex++;
+                        if (random.nextBoolean()) {
+                            enterLootRoom();
+                        } else {
+                            enterEnemyRoom();
+                        }   if (!player.isAlive()) {
+                            System.out.println("Game over.");
+                            return;
+                        }
+                    }
+                    case "2" -> player.rest();
+                    default -> {
+                        System.out.println("You go back one room. The dungeon transfigures..........");
+                        currentRoomIndex--;
+                        if (random.nextBoolean()) {
+                            enterLootRoom();
+                        } else {
+                            enterEnemyRoom();
+                        }   if (!player.isAlive()) {
+                            System.out.println("Game over.");
+                            return;
+                        }
+                    }
+                }
+                
+                // Final boss room after the first five rooms
+                if (player.isAlive() && currentRoomIndex>=5) {
+                    enterBossRoom();
+                }
+            }
         System.out.println("Your adventure has ended.");
+        }
+        else{
+            System.out.println("Weakling... Your adventure has ended.");
+        }
     }
-// only monster right now is a goblin, could implement randomization between multiple monsters.
+    
+        
+
+
+
+
     private void enterEnemyRoom() {
-        Monster monster = new Monster("Goblin", "A fierce goblin guarding the path", 30, 5, 10);
+        Scanner input = new Scanner(System.in);
+        Monster monster = new Monster("Slime", "A small blob", 30, 5, 10);
         System.out.println("An enemy " + monster + " appears! Prepare to fight.");
-
-        while (monster.isAlive() && player.isAlive()) {
-            // Monster attacks player
-            int damageToPlayer = monster.attack();
-            player.takeDamage(damageToPlayer);
-            System.out.printf("%s attacks you for %d damage. %s\n", monster.getName(), damageToPlayer, player.getStatus());
-
-            // Player attacks monster
-            if (player.isAlive()) {
-                monster.defend(player);
+        while(player.getHitPoints() >0 && monster.getHitPoints() >0){ 
+            if (player.getClas().equals("Knight")){
+                System.out.println("Choose number of your action: 1 - slash, 2 - shattering charge");
+                String combatChoice = input.nextLine();
+                if (combatChoice.equals("1")){
+                    player.slash(monster);
+                }
+                else{
+                    player.shatteringCharge(monster);
+                }
             }
+            if (player.getClas().equals("Mage")){
+                System.out.println("Choose number of your action: 1 - fireball, 2 - frostbolt");
+                String combatChoice = input.nextLine();
+                if (combatChoice.equals("1")){
+                    player.fireBall(monster);
+                }
+                else{
+                    player.frostBolt(monster);
+                }
+            }
+            monster.attack(player);
         }
-
-        if (!monster.isAlive()) {
-            System.out.println("You defeated the " + monster + "!");
+        
+        if (player.getHitPoints()>0){
+            System.out.println(player.getName() + " has defeated the " + monster.getName());
         }
+        else{
+            System.out.println(monster.getName() + " has defeated the" + player.getName());
+        }
+        
     }
-// one of the options for the rooms, if player gets this one, they health (if you want a currency system, that could be added too)
+
     private void enterLootRoom() {
         System.out.println("You find a chest filled with valuable loot!");
-        int lootPoints = 20;
+        int lootPoints = 20 * currentRoomIndex;
         player.collectLoot(lootPoints);
         System.out.println("You gained " + lootPoints + " HP from the loot.");
-        System.out.println(player + " hp is now:" + player.getStatus());
-    }
-//rushed this part, didnt add the puzzle yet.
-    private void enterPuzzleRoom() {
-        System.out.println("You encounter a mysterious puzzle on the wall. Solve it to proceed!");
-        System.out.println("You manage to solve the puzzle and continue.");
-    }
-//the index of rooms, what to say with what room you get.
-    private void searchCurrentRoom() {
-        if (currentRoomIndex == 0 || currentRoomIndex == 3 || currentRoomIndex == 4) {
-            System.out.println("You search the area and find signs of a recent battle.");
-        } else if (currentRoomIndex == 1) {
-            System.out.println("You search the area and find some loot.");
-        } else if (currentRoomIndex == 2) {
-            System.out.println("You search the area and find strange symbols related to the puzzle.");
-        }
+        System.out.println(player.getStatus());
     }
 }
