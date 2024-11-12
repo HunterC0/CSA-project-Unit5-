@@ -14,12 +14,12 @@ public class Game {
         System.out.println("Choose your Class: ");
         System.out.println("1). Knight");
         System.out.println("2). Mage");
-        System.out.println("Please type the number of your choice: ");
+        System.out.println("Please number of the class of your choice: ");
        
-        int classChoice = input.nextInt();
+        String classChoice = input.nextLine();
 
         // Initialize a player with a name, description, hit points, min damage, and max damage
-        if(classChoice == 1){
+        if(classChoice.equals("1")){
             Player player = new Player(name, description,"Knight", 50, 10, 20 );
             RoomSystem roomSystem = new RoomSystem(player);
             System.out.println("You have chosen the knight class. Higher HP but lower Damage");
