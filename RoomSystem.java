@@ -9,9 +9,48 @@ public class RoomSystem {
     public RoomSystem(Player player) {
         this.player = player;
     }
-    private void enterBossRoom(){
+    private void enterBossRoom(){ //boss
+        System.out.println("\n------------------------------------------------------------");
+        System.out.println("You enter the boss room.");
+        System.out.println("A massive shadow is looming over you.");
+        Scanner input = new Scanner(System.in);
         Monster slimeKingMonster = new Monster("King Slime", "An enormous slime with a crown", 90, 10, 40);
-
+        System.out.println("An enemy " + slimeKingMonster + " appears! " + slimeKingMonster.getDescription() + ". Prepare to fight.");
+        while(player.getHitPoints() >0 && slimeKingMonster.getHitPoints() >0){ // ||
+            if (player.getClas().equals("Knight")){
+                System.out.println("Type number of which action to do: 1 - slash, 2 - shattering charge");
+                String combatChoice = input.nextLine();
+                if (combatChoice.equals("1")){
+                    player.slash(slimeKingMonster);
+                }
+                else{
+                    player.shatteringCharge(slimeKingMonster);
+                }
+            }
+            if (player.getClas().equals("Mage")){
+                System.out.println("Type number of which action to do: 1 - fireball, 2 - frostbolt");
+                String combatChoice = input.nextLine();
+                if (combatChoice.equals("1")){
+                    player.fireBall(slimeKingMonster);
+                }
+                else{
+                    player.frostBolt(slimeKingMonster);
+                }
+            }
+            slimeKingMonster.attack(player);
+            System.out.println("");
+            System.out.println(player + "'s HP is :" + player.getHitPoints());
+            System.out.println(slimeKingMonster + "'s HP is : " + slimeKingMonster.getHitPoints());
+            System.out.println("");
+        }
+        
+        if (player.getHitPoints()>0){
+            System.out.println(player.getName() + " has defeated the " + slimeKingMonster.getName());
+            System.out.println("Congratulations you beat the game!");
+        }
+        else{
+            System.out.println(slimeKingMonster.getName() + " has defeated " + player.getName());
+        }
     }
     
     public void startAdventure() { //main method in main
@@ -19,6 +58,7 @@ public class RoomSystem {
         System.out.println("1 - Enter first room, 2 - Exit dungeon");
         String playerChoice = scanner.nextLine();
         if (playerChoice.equals("1")){
+            System.out.println("\n------------------------------------------------------------");
             System.out.println("\nYou enter room " + (currentRoomIndex + 1) + ".");
             if (random.nextBoolean()) {
                 enterLootRoom();
@@ -30,12 +70,15 @@ public class RoomSystem {
                 return;
             }
             while (player.isAlive() && currentRoomIndex < 5) {
+                System.out.println("\n------------------------------------------------------------");
                 System.out.println("1 - walk into the next room, 2 - rest to restore health, 3 - go one room back");
                 String playerRoomProgressChoice = scanner.nextLine();
 
                 switch (playerRoomProgressChoice) {
-                    case "1" -> {
+                    case "1": {
                         currentRoomIndex++;
+                        System.out.println("\n------------------------------------------------------------");
+                        System.out.println("\nYou enter room " + (currentRoomIndex + 1) + ".");
                         if (random.nextBoolean()) {
                             enterLootRoom();
                         } else {
@@ -44,19 +87,32 @@ public class RoomSystem {
                             System.out.println("Game over.");
                             return;
                         }
+                        break;
                     }
-                    case "2" -> player.rest();
-                    default -> {
-                        System.out.println("You go back one room. The dungeon transfigures..........");
-                        currentRoomIndex--;
-                        if (random.nextBoolean()) {
-                            enterLootRoom();
-                        } else {
-                            enterEnemyRoom();
-                        }   if (!player.isAlive()) {
+                    case "2":{
+                        System.out.println("\n------------------------------------------------------------");
+                        player.rest();
+                        break;
+                    }
+                    default: {
+                        if(currentRoomIndex > 0){
+                            System.out.println("\n------------------------------------------------------------");
+                            System.out.println("You go back one room. The dungeon transfigures..........");
+                            currentRoomIndex--;
+                            System.out.println("\nYou enter room " + (currentRoomIndex + 1) + ".");
+                            if (random.nextBoolean()) {
+                                enterLootRoom();
+                            } else {
+                                enterEnemyRoom();
+                            }
+                        }else{
+                            System.out.println("You are already at the start of the dungeon. You cannot go back further.");
+                        }
+                        if (!player.isAlive()) {
                             System.out.println("Game over.");
                             return;
                         }
+                        break;
                     }
                 }
                 
@@ -78,12 +134,13 @@ public class RoomSystem {
 
 
     private void enterEnemyRoom() {
+        
         Scanner input = new Scanner(System.in);
         Monster monster = new Monster("Slime", "A small blob", 30, 5, 10);
-        System.out.println("An enemy " + monster + " appears! Prepare to fight.");
+        System.out.println("An enemy " + monster + " appears! " + monster.getDescription() + ". Prepare to fight.");
         while(player.getHitPoints() >0 && monster.getHitPoints() >0){ 
             if (player.getClas().equals("Knight")){
-                System.out.println("Choose number of your action: 1 - slash, 2 - shattering charge");
+                System.out.println("Type number of which action to do: 1 - slash, 2 - shattering charge");
                 String combatChoice = input.nextLine();
                 if (combatChoice.equals("1")){
                     player.slash(monster);
@@ -93,7 +150,7 @@ public class RoomSystem {
                 }
             }
             if (player.getClas().equals("Mage")){
-                System.out.println("Choose number of your action: 1 - fireball, 2 - frostbolt");
+                System.out.println("Type number of which action to do: 1 - fireball, 2 - frostbolt");
                 String combatChoice = input.nextLine();
                 if (combatChoice.equals("1")){
                     player.fireBall(monster);
@@ -103,6 +160,10 @@ public class RoomSystem {
                 }
             }
             monster.attack(player);
+            System.out.println("");
+            System.out.println(player + "'s HP is :" + player.getHitPoints());
+            System.out.println(monster + "'s HP is : " + monster.getHitPoints());
+            System.out.println("");
         }
         
         if (player.getHitPoints()>0){
